@@ -4,7 +4,7 @@ import { Database } from './database';
 
 // JWT工具函数
 export class AuthService {
-  constructor(private env: Env, private db: Database) {}
+  constructor(private env: Env, private db: Database) { }
 
   // 生成JWT Token
   async generateToken(user: User): Promise<string> {
@@ -24,12 +24,12 @@ export class AuthService {
   async verifyToken(token: string): Promise<JWTPayload | null> {
     try {
       const payload = await this.verifyJWT(token, this.env.JWT_SECRET);
-      
+
       // 检查token是否过期
       if (payload.exp < Math.floor(Date.now() / 1000)) {
         return null;
       }
-      
+
       return payload;
     } catch (error) {
       return null;
@@ -39,13 +39,13 @@ export class AuthService {
   // JWT签名函数（使用Web Crypto API）
   private async signJWT(payload: JWTPayload, secret: string): Promise<string> {
     const header = { alg: 'HS256', typ: 'JWT' };
-    
+
     const encodedHeader = this.base64UrlEncode(JSON.stringify(header));
     const encodedPayload = this.base64UrlEncode(JSON.stringify(payload));
-    
+
     const data = `${encodedHeader}.${encodedPayload}`;
     const signature = await this.hmacSign(data, secret);
-    
+
     return `${data}.${signature}`;
   }
 
@@ -58,7 +58,7 @@ export class AuthService {
 
     const [encodedHeader, encodedPayload, signature] = parts;
     const data = `${encodedHeader}.${encodedPayload}`;
-    
+
     const expectedSignature = await this.hmacSign(data, secret);
     if (signature !== expectedSignature) {
       throw new Error('Invalid JWT signature');
@@ -77,7 +77,7 @@ export class AuthService {
       false,
       ['sign']
     );
-    
+
     const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(data));
     return this.base64UrlEncode(new Uint8Array(signature));
   }
@@ -301,7 +301,7 @@ export class AuthService {
         }),
       });
 
-      const tokenData = await tokenResponse.json();
+      const tokenData = await tokenResponse.json() as any;
       if (!tokenData.access_token) {
         return null;
       }
@@ -314,8 +314,8 @@ export class AuthService {
         },
       });
 
-      const userData = await userResponse.json();
-      
+      const userData = await userResponse.json() as any;
+
       // 获取用户邮箱（如果公开）
       const emailResponse = await fetch('https://api.github.com/user/emails', {
         headers: {
@@ -324,7 +324,7 @@ export class AuthService {
         },
       });
 
-      const emailData = await emailResponse.json();
+      const emailData = await emailResponse.json() as any;
       const primaryEmail = emailData.find((email: any) => email.primary)?.email || userData.email;
 
       return {
@@ -358,7 +358,7 @@ export class AuthService {
         }),
       });
 
-      const tokenData = await tokenResponse.json();
+      const tokenData = await tokenResponse.json() as any;
       if (!tokenData.access_token) {
         return null;
       }
@@ -370,7 +370,7 @@ export class AuthService {
         },
       });
 
-      const userData = await userResponse.json();
+      const userData = await userResponse.json() as any;
 
       return {
         id: userData.id,
@@ -390,7 +390,7 @@ export class AuthService {
     try {
       // 获取OAuth用户信息
       let oauthUser: OAuthUserInfo | null = null;
-      
+
       if (provider === 'github') {
         oauthUser = await this.authenticateWithGitHub(code);
       } else if (provider === 'google') {
@@ -410,7 +410,7 @@ export class AuthService {
 
       // 检查用户是否已存在
       let existingUser = await this.db.getUserByEmail(oauthUser.email);
-      
+
       if (existingUser) {
         // 用户已存在，直接登录
         if (existingUser.status !== 'active') {
@@ -429,12 +429,12 @@ export class AuthService {
           existingUser = await this.db.updateUser(existingUser.id, { avatar_url: oauthUser.avatar_url });
         }
 
-        const token = await this.generateToken(existingUser);
+        const token = await this.generateToken(existingUser!);
         return {
           code: 200,
           message: '登录成功',
           data: {
-            user: existingUser,
+            user: existingUser!,
             token
           },
           timestamp: new Date().toISOString()
