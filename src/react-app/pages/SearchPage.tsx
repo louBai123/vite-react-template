@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { 
   Search, 
-  Filter, 
   SlidersHorizontal,
   X,
   ChevronDown,
@@ -420,6 +419,8 @@ export const SearchPage: React.FC = () => {
                     <Pagination
                       currentPage={currentPage}
                       totalPages={totalPages}
+                      totalItems={workflows.length * totalPages}
+                      itemsPerPage={20}
                       onPageChange={setCurrentPage}
                     />
                   </div>

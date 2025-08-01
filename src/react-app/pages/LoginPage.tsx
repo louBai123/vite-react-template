@@ -57,7 +57,7 @@ export const LoginPage: React.FC = () => {
 
     try {
       setLoading(true);
-      await login(formData);
+      await login(formData.email, formData.password);
       // 登录成功后跳转到首页
       window.location.href = '/';
     } catch (error) {

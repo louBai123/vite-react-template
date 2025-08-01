@@ -9,7 +9,6 @@ import {
   ArrowRight, 
   Check,
   UserCheck,
-  Briefcase,
   Megaphone
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -147,12 +146,7 @@ export const RegisterPage: React.FC = () => {
 
     try {
       setLoading(true);
-      await register({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        role: formData.role,
-      });
+      await register(formData.username, formData.email, formData.password, formData.role);
       // 注册成功后跳转到首页
       window.location.href = '/';
     } catch (error) {

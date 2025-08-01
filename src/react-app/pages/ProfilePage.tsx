@@ -7,14 +7,9 @@ import {
   Download, 
   CreditCard, 
   History,
-  Upload,
   Camera,
   Save,
-  Edit3,
-  Mail,
-  Calendar,
-  MapPin,
-  Link as LinkIcon
+  Edit3
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Workflow, Transaction } from '../types';
@@ -128,7 +123,6 @@ export const ProfilePage: React.FC = () => {
         >
           {isEditing ? (
             <>
-              <X className="w-4 h-4 mr-2" />
               取消
             </>
           ) : (
@@ -373,7 +367,7 @@ export const ProfilePage: React.FC = () => {
                       {new Date(transaction.created_at).toLocaleString('zh-CN')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {transaction.type === 'purchase' ? '购买' : '充值'}
+                      购买
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       ¥{transaction.amount.toFixed(2)}
