@@ -8,6 +8,7 @@ import {
   Zap
 } from 'lucide-react';
 import { Workflow, Category } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
 import api from '../services/api';
 import { WorkflowCard } from '../components/WorkflowCard';
 import { SearchBox } from '../components/SearchAndFilter';
@@ -34,6 +35,7 @@ interface FeaturedCategory {
 
 // 首页组件
 export const HomePage: React.FC = () => {
+  const { t } = useLanguage();
   const [featuredWorkflows, setFeaturedWorkflows] = useState<Workflow[]>([]);
   const [popularWorkflows, setPopularWorkflows] = useState<Workflow[]>([]);
   const [recentWorkflows, setRecentWorkflows] = useState<Workflow[]>([]);
@@ -51,32 +53,32 @@ export const HomePage: React.FC = () => {
   const featuredCategories: FeaturedCategory[] = [
     {
       id: 1,
-      name: '自动化工具',
-      description: '提升工作效率的自动化解决方案',
+      name: t('category.automation'),
+      description: t('category.automation.desc'),
       icon: <Zap className="w-8 h-8" />,
       workflowCount: 156,
       color: 'from-blue-500 to-cyan-500',
     },
     {
       id: 2,
-      name: '数据处理',
-      description: '数据分析和处理的专业工具',
+      name: t('category.data'),
+      description: t('category.data.desc'),
       icon: <Target className="w-8 h-8" />,
       workflowCount: 89,
       color: 'from-green-500 to-emerald-500',
     },
     {
       id: 3,
-      name: '内容创作',
-      description: '创意内容生成和编辑工具',
+      name: t('category.content'),
+      description: t('category.content.desc'),
       icon: <Sparkles className="w-8 h-8" />,
       workflowCount: 124,
       color: 'from-purple-500 to-pink-500',
     },
     {
       id: 4,
-      name: '营销推广',
-      description: '营销活动和推广的智能工具',
+      name: t('category.marketing'),
+      description: t('category.marketing.desc'),
       icon: <TrendingUp className="w-8 h-8" />,
       workflowCount: 67,
       color: 'from-orange-500 to-red-500',
@@ -173,13 +175,13 @@ export const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center space-y-8">
             <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-              发现最佳
+              {t('home.hero.title')}
               <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                工作流
+                {t('home.hero.title.highlight')}
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto">
-              探索由社区创建的高质量工作流，提升您的工作效率
+              {t('home.hero.subtitle')}
             </p>
             
             {/* 搜索框 */}
@@ -188,7 +190,7 @@ export const HomePage: React.FC = () => {
                 value={searchQuery}
                 onChange={setSearchQuery}
                 onSearch={handleSearch}
-                placeholder="搜索工作流、分类或标签..."
+                placeholder={t('home.hero.search.placeholder')}
                 className="bg-white/10 backdrop-blur-sm border-white/20"
               />
             </div>
@@ -197,19 +199,19 @@ export const HomePage: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto pt-8">
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold">{stats.totalWorkflows.toLocaleString()}</div>
-                <div className="text-blue-200">工作流</div>
+                <div className="text-blue-200">{t('home.stats.workflows')}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold">{stats.totalUsers.toLocaleString()}</div>
-                <div className="text-blue-200">用户</div>
+                <div className="text-blue-200">{t('home.stats.users')}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold">{stats.totalDownloads.toLocaleString()}</div>
-                <div className="text-blue-200">下载量</div>
+                <div className="text-blue-200">{t('home.stats.downloads')}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold">{stats.totalCategories}</div>
-                <div className="text-blue-200">分类</div>
+                <div className="text-blue-200">{t('home.stats.categories')}</div>
               </div>
             </div>
           </div>
@@ -220,8 +222,8 @@ export const HomePage: React.FC = () => {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">热门分类</h2>
-            <p className="text-lg text-gray-600">探索不同领域的专业工作流</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('home.categories.title')}</h2>
+            <p className="text-lg text-gray-600">{t('home.categories.subtitle')}</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -244,7 +246,7 @@ export const HomePage: React.FC = () => {
                   <p className="text-sm text-gray-600">{category.description}</p>
                   <div className="flex items-center justify-between pt-2">
                     <span className="text-sm text-gray-500">
-                      {category.workflowCount} 个工作流
+                      {category.workflowCount} {t('category.workflows')}
                     </span>
                     <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
                   </div>
@@ -260,11 +262,11 @@ export const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">精选工作流</h2>
-              <p className="text-lg text-gray-600">编辑推荐的高质量工作流</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('home.featured.title')}</h2>
+              <p className="text-lg text-gray-600">{t('home.featured.subtitle')}</p>
             </div>
             <Button variant="outline" className="flex items-center space-x-2">
-              <span>查看全部</span>
+              <span>{t('home.viewAll')}</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
@@ -288,11 +290,11 @@ export const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">热门工作流</h2>
-              <p className="text-lg text-gray-600">社区最受欢迎的工作流</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('home.popular.title')}</h2>
+              <p className="text-lg text-gray-600">{t('home.popular.subtitle')}</p>
             </div>
             <Button variant="outline" className="flex items-center space-x-2">
-              <span>查看全部</span>
+              <span>{t('home.viewAll')}</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
@@ -316,11 +318,11 @@ export const HomePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">最新工作流</h2>
-              <p className="text-lg text-gray-600">刚刚发布的新工作流</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('home.recent.title')}</h2>
+              <p className="text-lg text-gray-600">{t('home.recent.subtitle')}</p>
             </div>
             <Button variant="outline" className="flex items-center space-x-2">
-              <span>查看全部</span>
+              <span>{t('home.viewAll')}</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
@@ -343,10 +345,10 @@ export const HomePage: React.FC = () => {
       <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            准备好分享您的工作流了吗？
+            {t('home.cta.title')}
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            加入我们的创作者社区，分享您的创意，获得收益
+            {t('home.cta.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Button 
@@ -354,14 +356,14 @@ export const HomePage: React.FC = () => {
               size="lg"
               className="bg-white text-blue-600 hover:bg-gray-100"
             >
-              开始创作
+              {t('home.cta.start')}
             </Button>
             <Button 
               variant="outline" 
               size="lg"
               className="border-white text-white hover:bg-white hover:text-blue-600"
             >
-              了解更多
+              {t('home.cta.learn')}
             </Button>
           </div>
         </div>

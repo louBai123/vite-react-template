@@ -18,6 +18,8 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 
@@ -41,6 +43,7 @@ interface UserMenuItem {
 // 顶部导航栏组件
 export const TopNavigation: React.FC = () => {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,21 +51,21 @@ export const TopNavigation: React.FC = () => {
 
   // 主导航链接
   const mainNavLinks: NavLink[] = [
-    { label: '首页', href: '/', icon: <Home className="w-4 h-4" /> },
-    { label: '发现', href: '/discover', icon: <Compass className="w-4 h-4" /> },
-    { label: '热门', href: '/trending', icon: <TrendingUp className="w-4 h-4" /> },
-    { label: '精选', href: '/featured', icon: <Star className="w-4 h-4" /> },
+    { label: t('nav.home'), href: '/', icon: <Home className="w-4 h-4" /> },
+    { label: t('nav.discover'), href: '/discover', icon: <Compass className="w-4 h-4" /> },
+    { label: t('nav.trending'), href: '/trending', icon: <TrendingUp className="w-4 h-4" /> },
+    { label: t('nav.featured'), href: '/featured', icon: <Star className="w-4 h-4" /> },
   ];
 
   // 用户菜单项
   const userMenuItems: UserMenuItem[] = [
-    { label: '个人资料', href: '/profile', icon: <User className="w-4 h-4" /> },
-    { label: '我的工作流', href: '/my-workflows', icon: <Heart className="w-4 h-4" /> },
-    { label: '购买记录', href: '/purchases', icon: <ShoppingCart className="w-4 h-4" /> },
-    { label: '创作中心', href: '/creator', icon: <Upload className="w-4 h-4" /> },
+    { label: t('nav.user.menu.profile'), href: '/profile', icon: <User className="w-4 h-4" /> },
+    { label: t('nav.user.menu.workflows'), href: '/my-workflows', icon: <Heart className="w-4 h-4" /> },
+    { label: t('nav.user.menu.purchases'), href: '/purchases', icon: <ShoppingCart className="w-4 h-4" /> },
+    { label: t('nav.user.menu.creator'), href: '/creator', icon: <Upload className="w-4 h-4" /> },
     { divider: true, label: '', icon: <></> },
-    { label: '设置', href: '/settings', icon: <Settings className="w-4 h-4" /> },
-    { label: '退出登录', icon: <LogOut className="w-4 h-4" />, onClick: logout },
+    { label: t('nav.user.menu.settings'), href: '/settings', icon: <Settings className="w-4 h-4" /> },
+    { label: t('nav.user.menu.logout'), icon: <LogOut className="w-4 h-4" />, onClick: logout },
   ];
 
   // 点击外部关闭用户菜单
@@ -97,7 +100,7 @@ export const TopNavigation: React.FC = () => {
                 <span className="text-white font-bold text-sm">WF</span>
               </div>
               <span className="text-xl font-bold text-gray-900 hidden sm:block">
-                工作流分享平台
+                {t('brand.name')}
               </span>
             </a>
           </div>
@@ -127,7 +130,7 @@ export const TopNavigation: React.FC = () => {
               <div className="relative">
                 <Input
                   type="text"
-                  placeholder="搜索工作流..."
+                  placeholder={t('nav.search.placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 pr-4"
@@ -139,6 +142,9 @@ export const TopNavigation: React.FC = () => {
 
           {/* 右侧操作区 */}
           <div className="flex items-center space-x-4">
+            {/* 语言切换器 */}
+            <LanguageSwitcher />
+
             {/* 通知 */}
             {user && (
               <Button variant="ghost" size="sm" className="relative">
@@ -192,10 +198,10 @@ export const TopNavigation: React.FC = () => {
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="ghost" size="sm">
-                  <a href="/login">登录</a>
+                  <a href="/login">{t('common.login')}</a>
                 </Button>
                 <Button variant="primary" size="sm">
-                  <a href="/register">注册</a>
+                  <a href="/register">{t('common.register')}</a>
                 </Button>
               </div>
             )}
@@ -221,7 +227,7 @@ export const TopNavigation: React.FC = () => {
                 <div className="relative">
                   <Input
                     type="text"
-                    placeholder="搜索工作流..."
+                    placeholder={t('nav.search.placeholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10 pr-4"
@@ -258,21 +264,23 @@ export const TopNavigation: React.FC = () => {
 
 // 侧边栏导航组件
 export const SideNavigation: React.FC<{ className?: string }> = ({ className }) => {
+  const { t } = useLanguage();
+  
   const sideNavLinks: NavLink[] = [
-    { label: '全部分类', href: '/categories' },
-    { label: '自动化工具', href: '/categories/automation' },
-    { label: '数据处理', href: '/categories/data-processing' },
-    { label: '内容创作', href: '/categories/content-creation' },
-    { label: '营销推广', href: '/categories/marketing' },
-    { label: '办公效率', href: '/categories/productivity' },
-    { label: '设计创意', href: '/categories/design' },
-    { label: '开发工具', href: '/categories/development' },
+    { label: t('common.categories'), href: '/categories' },
+    { label: t('category.automation'), href: '/categories/automation' },
+    { label: t('category.data'), href: '/categories/data-processing' },
+    { label: t('category.content'), href: '/categories/content-creation' },
+    { label: t('category.marketing'), href: '/categories/marketing' },
+    { label: 'Office Productivity', href: '/categories/productivity' },
+    { label: 'Design & Creative', href: '/categories/design' },
+    { label: 'Development Tools', href: '/categories/development' },
   ];
 
   return (
     <aside className={clsx('w-64 bg-white border-r border-gray-200', className)}>
       <div className="p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">工作流分类</h3>
+        <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('nav.categories')}</h3>
         <nav className="space-y-1">
           {sideNavLinks.map((link) => (
             <a
