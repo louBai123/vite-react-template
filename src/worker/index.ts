@@ -1,12 +1,21 @@
-import { Hono } from 'hono';
+import { Hono, Context, Next } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
-import { Env, WorkflowSearchParams } from './types';
+import { Env, User, JWTPayload } from './types';
 import { Database } from './database';
 import { AuthService, createSuccessResponse, createErrorResponse, validateEmail, validateUsername, sanitizeInput } from './auth';
 
-const app = new Hono<{ Bindings: Env }>();
+// 自定义Context类型
+type AppContext = {
+  Bindings: Env;
+  Variables: {
+    user: User;
+    payload: JWTPayload;
+  };
+};
+
+const app = new Hono<AppContext>();
 
 // 中间件
 app.use('*', cors({
@@ -20,7 +29,7 @@ app.use('*', logger());
 app.use('/api/*', prettyJSON());
 
 // 认证中间件
-const authMiddleware = async (c: any, next: any) => {
+const authMiddleware = async (c: Context<AppContext>, next: Next) => {
   const authHeader = c.req.header('Authorization');
   if (!authHeader) {
     return c.json(createErrorResponse(401, '未提供认证信息'), 401);
@@ -45,7 +54,7 @@ const authMiddleware = async (c: any, next: any) => {
 };
 
 // 管理员权限中间件
-const adminMiddleware = async (c: any, next: any) => {
+const adminMiddleware = async (c: Context<AppContext>, next: Next) => {
   const user = c.get('user');
   if (!user || user.role !== 'admin') {
     return c.json(createErrorResponse(403, '需要管理员权限'), 403);
@@ -54,7 +63,7 @@ const adminMiddleware = async (c: any, next: any) => {
 };
 
 // 创作者权限中间件
-const creatorMiddleware = async (c: any, next: any) => {
+const creatorMiddleware = async (c: Context<AppContext>, next: Next) => {
   const user = c.get('user');
   if (!user || !['creator', 'admin'].includes(user.role)) {
     return c.json(createErrorResponse(403, '需要创作者权限'), 403);
@@ -100,7 +109,7 @@ app.post('/api/auth/register', async (c) => {
       role
     );
 
-    return c.json(result, result.code);
+    return c.json(result, result.code as any);
   } catch (error) {
     return c.json(createErrorResponse(500, '注册失败', 'server', '服务器内部错误'), 500);
   }
@@ -123,7 +132,7 @@ app.post('/api/auth/login', async (c) => {
     const authService = new AuthService(c.env, db);
     
     const result = await authService.login(sanitizeInput(email), password);
-    return c.json(result, result.code);
+    return c.json(result, result.code as any);
   } catch (error) {
     return c.json(createErrorResponse(500, '登录失败', 'server', '服务器内部错误'), 500);
   }
@@ -355,7 +364,7 @@ app.put('/api/admin/workflows/:id/status', authMiddleware, adminMiddleware, asyn
   try {
     const id = parseInt(c.req.param('id'));
     const body = await c.req.json();
-    const { status, reason } = body;
+    const { status } = body;
 
     if (!['pending', 'approved', 'rejected', 'offline'].includes(status)) {
       return c.json(createErrorResponse(400, '无效的状态值'), 400);

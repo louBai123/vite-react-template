@@ -125,13 +125,13 @@ export class AuthService {
         balance: 0,
         total_earnings: 0,
         status: 'active'
-      });
+      } as any);
 
       // 生成token
       const token = await this.generateToken(newUser);
 
       // 移除密码哈希
-      const { password_hash, ...userWithoutPassword } = newUser;
+      const { password_hash: _, ...userWithoutPassword } = newUser as any;
 
       return {
         code: 200,

@@ -93,8 +93,15 @@ export interface WorkflowSearchParams {
   status?: string;
   featured?: boolean;
   search?: string;
-  sortBy?: 'hot' | 'latest' | 'rating' | 'price_low' | 'price_high';
+  sortBy?: string;
   creatorId?: number;
+  tags?: string[];
+  category_id?: number;
+  min_price?: number;
+  max_price?: number;
+  min_rating?: number;
+  is_free?: boolean;
+  sort_by?: string;
 }
 
 // 分类相关类型
@@ -335,7 +342,4 @@ export interface RolePermissions {
   permissions: Permission[];
 }
 
-// 导出所有类型
-export * from './api';
-export * from './components';
-export * from './hooks';
+// 导出所有类型 - 所有类型已在此文件中定义

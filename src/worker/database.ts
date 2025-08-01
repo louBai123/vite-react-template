@@ -1,5 +1,5 @@
 // 数据库操作工具函数
-import { Env, User, Workflow, Category, Transaction, Review, PaginatedResponse } from './types';
+import { Env, User, Workflow, Category, PaginatedResponse } from './types';
 
 // 模拟数据库操作（在实际部署时需要连接到真实数据库）
 // 这里使用内存数据作为演示
@@ -155,7 +155,7 @@ const mockWorkflows: Workflow[] = [
 
 // 数据库操作函数
 export class Database {
-  constructor(private env: Env) {}
+  constructor(_env: Env) {}
 
   // 用户相关操作
   async getUserById(id: number): Promise<User | null> {

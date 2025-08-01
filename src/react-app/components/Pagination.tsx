@@ -80,7 +80,7 @@ const generatePageNumbers = (currentPage: number, totalPages: number): (number |
 // 分页信息组件
 const PaginationInfo: React.FC<PaginationInfoProps> = ({
   currentPage,
-  totalPages,
+
   totalItems,
   itemsPerPage,
   className,

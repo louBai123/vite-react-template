@@ -156,10 +156,10 @@ export const TopNavigation: React.FC = () => {
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 >
                   <img
-                    src={user.avatar || '/default-avatar.png'}
-                    alt={user.username}
-                    className="w-8 h-8 rounded-full"
-                  />
+                      src={user.avatar_url || '/default-avatar.png'}
+                      alt={user.username}
+                      className="w-8 h-8 rounded-full"
+                    />
                   <span className="hidden sm:block text-sm font-medium">
                     {user.username}
                   </span>

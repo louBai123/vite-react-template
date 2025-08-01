@@ -7,26 +7,22 @@ import {
   Star, 
   Eye, 
   Calendar, 
-  User, 
   Tag, 
   Shield, 
   Clock,
-  MessageCircle,
   ThumbsUp,
-  ThumbsDown,
   Flag,
   ChevronLeft,
   ChevronRight,
-  Play,
-  Pause
+  X
 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
-import { Workflow, Review, User as UserType } from '../types';
+import { Workflow, Review } from '../types';
 import api from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { Input } from '../components/ui/Input';
+
 import { WorkflowCard } from '../components/WorkflowCard';
 import { Breadcrumb } from '../components/Navigation';
 
@@ -58,21 +54,21 @@ export const WorkflowDetailPage: React.FC = () => {
           api.review.getWorkflowReviews(parseInt(id)),
         ]);
         
-        setWorkflow(workflowRes.data);
-        setReviews(reviewsRes.data.items);
+        setWorkflow(workflowRes);
+        setReviews(reviewsRes.items);
         
         // 加载相关工作流
-        if (workflowRes.data.category_id) {
+        if (workflowRes.category_id) {
           const relatedRes = await api.workflow.getWorkflows({
-            category_id: workflowRes.data.category_id,
-            limit: 4,
+            category: workflowRes.category_id,
+            pageSize: 4,
           });
-          setRelatedWorkflows(relatedRes.data.items.filter(w => w.id !== parseInt(id)));
+          setRelatedWorkflows(relatedRes.items.filter((w: Workflow) => w.id !== parseInt(id)));
         }
         
         // 检查是否已收藏和购买（模拟）
         setIsFavorited(false);
-        setIsPurchased(workflowRes.data.price === 0);
+        setIsPurchased(workflowRes.price === 0);
       } catch (error) {
         console.error('Failed to load workflow detail:', error);
       } finally {
@@ -160,7 +156,7 @@ export const WorkflowDetailPage: React.FC = () => {
         comment: reviewText.trim(),
       });
       
-      setReviews([newReview.data, ...reviews]);
+      setReviews([newReview, ...reviews]);
       setReviewText('');
       setReviewRating(5);
     } catch (error) {
@@ -379,7 +375,7 @@ export const WorkflowDetailPage: React.FC = () => {
             <Card className="p-4">
               <div className="flex items-center space-x-4">
                 <img
-                  src={workflow.creator?.avatar || '/default-avatar.png'}
+                  src={workflow.creator?.avatar_url || '/default-avatar.png'}
                   alt={workflow.creator?.username}
                   className="w-12 h-12 rounded-full"
                 />
@@ -519,7 +515,7 @@ export const WorkflowDetailPage: React.FC = () => {
                     <div key={review.id} className="border-b border-gray-200 pb-6 last:border-b-0">
                       <div className="flex items-start space-x-4">
                         <img
-                          src={review.user?.avatar || '/default-avatar.png'}
+                          src={review.user?.avatar_url || '/default-avatar.png'}
                           alt={review.user?.username}
                           className="w-10 h-10 rounded-full"
                         />

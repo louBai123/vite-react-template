@@ -15,7 +15,7 @@ import {
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { Card } from './ui/Card';
-import { WorkflowSearchParams, Category, FilterOptions } from '../types';
+import { WorkflowSearchParams, Category } from '../types';
 
 // 搜索框组件属性
 interface SearchBoxProps {
@@ -204,8 +204,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   type="radio"
                   name="sort"
                   value={option.value}
-                  checked={filters.sort_by === option.value}
-                  onChange={(e) => updateFilter('sort_by', e.target.value)}
+                  checked={filters.sortBy === option.value}
+                  onChange={(e) => updateFilter('sortBy', e.target.value)}
                   className="text-blue-600 focus:ring-blue-500"
                 />
                 <div className="flex items-center space-x-2">
@@ -226,8 +226,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                 type="radio"
                 name="category"
                 value=""
-                checked={!filters.category_id}
-                onChange={() => updateFilter('category_id', undefined)}
+                checked={!filters.category}
+              onChange={() => updateFilter('category', undefined)}
                 className="text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700">全部分类</span>
@@ -238,8 +238,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
                   type="radio"
                   name="category"
                   value={category.id}
-                  checked={filters.category_id === category.id}
-                  onChange={(e) => updateFilter('category_id', parseInt(e.target.value))}
+                  checked={filters.category === category.id}
+              onChange={(e) => updateFilter('category', parseInt(e.target.value))}
                   className="text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700">{category.name}</span>
@@ -341,8 +341,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             <label className="flex items-center space-x-2 cursor-pointer">
               <input
                 type="checkbox"
-                checked={filters.is_featured || false}
-                onChange={(e) => updateFilter('is_featured', e.target.checked || undefined)}
+                checked={filters.featured || false}
+                onChange={(e) => updateFilter('featured', e.target.checked || undefined)}
                 className="text-blue-600 focus:ring-blue-500 rounded"
               />
               <span className="text-sm text-gray-700">仅显示精选</span>
@@ -374,10 +374,10 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({
     const tags: Array<{ key: keyof WorkflowSearchParams; value?: any; label: string }> = [];
 
     // 分类
-    if (filters.category_id) {
-      const category = categories.find(c => c.id === filters.category_id);
+    if (filters.category) {
+      const category = categories.find(c => c.id === filters.category);
       if (category) {
-        tags.push({ key: 'category_id', label: `分类: ${category.name}` });
+        tags.push({ key: 'category', label: `分类: ${category.name}` });
       }
     }
 
@@ -404,8 +404,8 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({
     }
 
     // 精选
-    if (filters.is_featured) {
-      tags.push({ key: 'is_featured', label: '精选' });
+    if (filters.featured) {
+      tags.push({ key: 'featured', label: '精选' });
     }
 
     return tags;
@@ -427,11 +427,11 @@ export const ActiveFilters: React.FC<ActiveFiltersProps> = ({
         >
           {tag.label}
           <button
-            onClick={() => onRemoveFilter(tag.key, tag.value)}
-            className="ml-2 text-blue-600 hover:text-blue-800"
-          >
-            <X className="w-3 h-3" />
-          </button>
+          onClick={() => onRemoveFilter(tag.key as keyof WorkflowSearchParams, tag.value)}
+          className="ml-2 text-blue-600 hover:text-blue-800"
+        >
+          <X className="w-3 h-3" />
+        </button>
         </span>
       ))}
       <Button

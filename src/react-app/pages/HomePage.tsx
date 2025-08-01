@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { clsx } from 'clsx';
 import { 
   TrendingUp, 
-  Star, 
-  Download, 
-  Users, 
   ArrowRight,
   Sparkles,
   Target,
@@ -40,7 +37,7 @@ export const HomePage: React.FC = () => {
   const [featuredWorkflows, setFeaturedWorkflows] = useState<Workflow[]>([]);
   const [popularWorkflows, setPopularWorkflows] = useState<Workflow[]>([]);
   const [recentWorkflows, setRecentWorkflows] = useState<Workflow[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [, setCategories] = useState<Category[]>([]);
   const [stats, setStats] = useState<Stats>({
     totalWorkflows: 0,
     totalUsers: 0,
@@ -94,23 +91,23 @@ export const HomePage: React.FC = () => {
         
         // 并行加载数据
         const [featuredRes, popularRes, recentRes, categoriesRes] = await Promise.all([
-          api.workflow.getWorkflows({ is_featured: true, limit: 8 }),
-          api.workflow.getWorkflows({ sort_by: 'popular', limit: 8 }),
-          api.workflow.getWorkflows({ sort_by: 'latest', limit: 8 }),
+          api.workflow.getWorkflows({ featured: true, pageSize: 8 }),
+          api.workflow.getWorkflows({ sortBy: 'hot', pageSize: 8 }),
+          api.workflow.getWorkflows({ sortBy: 'latest', pageSize: 8 }),
           api.category.getCategories(),
         ]);
 
-        setFeaturedWorkflows(featuredRes.data.items);
-        setPopularWorkflows(popularRes.data.items);
-        setRecentWorkflows(recentRes.data.items);
-        setCategories(categoriesRes.data);
+        setFeaturedWorkflows(featuredRes.items);
+        setPopularWorkflows(popularRes.items);
+        setRecentWorkflows(recentRes.items);
+        setCategories(categoriesRes);
 
         // 模拟统计数据
         setStats({
           totalWorkflows: 1250,
           totalUsers: 8900,
           totalDownloads: 45600,
-          totalCategories: categoriesRes.data.length,
+          totalCategories: categoriesRes.length,
         });
       } catch (error) {
         console.error('Failed to load homepage data:', error);
