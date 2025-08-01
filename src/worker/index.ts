@@ -38,7 +38,7 @@ const authMiddleware = async (c: Context<AppContext>, next: Next) => {
   const db = new Database(c.env);
   const authService = new AuthService(c.env, db);
   const token = authService.extractTokenFromHeader(authHeader);
-  
+
   if (!token) {
     return c.json(createErrorResponse(401, '无效的认证格式'), 401);
   }
@@ -101,7 +101,7 @@ app.post('/api/auth/register', async (c) => {
 
     const db = new Database(c.env);
     const authService = new AuthService(c.env, db);
-    
+
     const result = await authService.register(
       sanitizeInput(username),
       sanitizeInput(email),
@@ -130,11 +130,71 @@ app.post('/api/auth/login', async (c) => {
 
     const db = new Database(c.env);
     const authService = new AuthService(c.env, db);
-    
+
     const result = await authService.login(sanitizeInput(email), password);
     return c.json(result, result.code as any);
   } catch (error) {
     return c.json(createErrorResponse(500, '登录失败', 'server', '服务器内部错误'), 500);
+  }
+});
+
+// OAuth注册/登录路由
+app.post('/api/auth/oauth/:provider', async (c) => {
+  try {
+    const provider = c.req.param('provider') as 'github' | 'google';
+    const body = await c.req.json();
+    const { code, role = 'user' } = body;
+
+    if (!['github', 'google'].includes(provider)) {
+      return c.json(createErrorResponse(400, '不支持的OAuth提供商'), 400);
+    }
+
+    if (!code) {
+      return c.json(createErrorResponse(400, '缺少授权码', 'code', '请提供OAuth授权码'), 400);
+    }
+
+    const db = new Database(c.env);
+    const authService = new AuthService(c.env, db);
+
+    const result = await authService.oauthRegister(provider, code, role);
+    return c.json(result, result.code as any);
+  } catch (error) {
+    return c.json(createErrorResponse(500, 'OAuth认证失败', 'server', '服务器内部错误'), 500);
+  }
+});
+
+// 获取OAuth授权URL
+app.get('/api/auth/oauth/:provider/url', async (c) => {
+  try {
+    const provider = c.req.param('provider') as 'github' | 'google';
+    const redirectUri = c.req.query('redirect_uri') || `${c.env.ENVIRONMENT === 'production' ? 'https://your-domain.com' : 'http://localhost:5173'}/auth/${provider}/callback`;
+
+    let authUrl = '';
+    
+    if (provider === 'github') {
+      const params = new URLSearchParams({
+        client_id: c.env.GITHUB_CLIENT_ID,
+        redirect_uri: redirectUri,
+        scope: 'user:email',
+        state: Math.random().toString(36).substring(7), // 简单的state参数
+      });
+      authUrl = `https://github.com/login/oauth/authorize?${params.toString()}`;
+    } else if (provider === 'google') {
+      const params = new URLSearchParams({
+        client_id: c.env.GOOGLE_CLIENT_ID,
+        redirect_uri: redirectUri,
+        response_type: 'code',
+        scope: 'openid email profile',
+        state: Math.random().toString(36).substring(7),
+      });
+      authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+    } else {
+      return c.json(createErrorResponse(400, '不支持的OAuth提供商'), 400);
+    }
+
+    return c.json(createSuccessResponse({ authUrl }));
+  } catch (error) {
+    return c.json(createErrorResponse(500, '获取授权URL失败', 'server', '服务器内部错误'), 500);
   }
 });
 
@@ -152,20 +212,20 @@ app.put('/api/user/profile', authMiddleware, async (c) => {
 
     const db = new Database(c.env);
     const updates: any = {};
-    
+
     if (username && username !== user.username) {
       if (!validateUsername(username)) {
         return c.json(createErrorResponse(400, '用户名格式错误', 'username', '用户名只能包含字母、数字和下划线，长度3-20位'), 400);
       }
-      
+
       const existingUser = await db.getUserByUsername(username);
       if (existingUser && existingUser.id !== user.id) {
         return c.json(createErrorResponse(400, '用户名已存在', 'username', '该用户名已被使用'), 400);
       }
-      
+
       updates.username = sanitizeInput(username);
     }
-    
+
     if (avatar_url) {
       updates.avatar_url = sanitizeInput(avatar_url);
     }
@@ -197,7 +257,7 @@ app.get('/api/categories/:id', async (c) => {
 
     const db = new Database(c.env);
     const category = await db.getCategoryById(id);
-    
+
     if (!category) {
       return c.json(createErrorResponse(404, '分类不存在'), 404);
     }
@@ -239,7 +299,7 @@ app.get('/api/workflows/:id', async (c) => {
 
     const db = new Database(c.env);
     const workflow = await db.getWorkflowById(id);
-    
+
     if (!workflow) {
       return c.json(createErrorResponse(404, '工作流不存在'), 404);
     }
@@ -310,17 +370,17 @@ app.get('/api/creator/stats', authMiddleware, creatorMiddleware, async (c) => {
   try {
     const user = c.get('user');
     const db = new Database(c.env);
-    
+
     // 获取创作者的工作流
     const workflows = await db.getWorkflows({ creatorId: user.id, pageSize: 1000 });
-    
+
     const stats = {
       totalEarnings: user.total_earnings,
       monthlyEarnings: user.total_earnings * 0.3, // 假设30%是本月收入
       workflowCount: workflows.items.length,
       totalDownloads: workflows.items.reduce((sum, w) => sum + w.download_count, 0),
-      averageRating: workflows.items.length > 0 
-        ? workflows.items.reduce((sum, w) => sum + w.rating, 0) / workflows.items.length 
+      averageRating: workflows.items.length > 0
+        ? workflows.items.reduce((sum, w) => sum + w.rating, 0) / workflows.items.length
         : 0
     };
 
@@ -372,7 +432,7 @@ app.put('/api/admin/workflows/:id/status', authMiddleware, adminMiddleware, asyn
 
     const db = new Database(c.env);
     const workflow = await db.updateWorkflow(id, { status });
-    
+
     if (!workflow) {
       return c.json(createErrorResponse(404, '工作流不存在'), 404);
     }

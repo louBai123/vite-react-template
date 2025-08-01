@@ -99,7 +99,8 @@ class ApiClient {
         params,
       });
 
-      if (response.data.success) {
+      // 检查响应状态码
+      if (response.data.code === 200) {
         return response.data.data as T;
       } else {
         throw new Error(response.data.message || '请求失败');
@@ -146,6 +147,16 @@ export const authApi = {
   // 用户登录
   login: (data: LoginRequest): Promise<AuthResponse> => {
     return apiClient.post<AuthResponse>('/auth/login', data);
+  },
+
+  // OAuth注册/登录
+  oauthLogin: (provider: 'github' | 'google', code: string, role?: string): Promise<AuthResponse> => {
+    return apiClient.post<AuthResponse>(`/auth/oauth/${provider}`, { code, role });
+  },
+
+  // 获取OAuth授权URL
+  getOAuthUrl: (provider: 'github' | 'google', redirectUri?: string): Promise<{ authUrl: string }> => {
+    return apiClient.get<{ authUrl: string }>(`/auth/oauth/${provider}/url`, { redirect_uri: redirectUri });
   },
 
   // 获取当前用户信息

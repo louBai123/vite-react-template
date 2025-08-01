@@ -170,6 +170,13 @@ export class Database {
     return mockUsers.find(user => user.username === username) || null;
   }
 
+  async getUserByOAuth(provider: string, oauthId: string): Promise<User | null> {
+    return mockUsers.find(user => 
+      (user as any).oauth_provider === provider && 
+      (user as any).oauth_id === oauthId
+    ) || null;
+  }
+
   async createUser(userData: Omit<User, 'id' | 'created_at' | 'updated_at'>): Promise<User> {
     const newUser: User = {
       ...userData,

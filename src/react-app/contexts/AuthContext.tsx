@@ -79,6 +79,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string, role?: string) => Promise<void>;
+  oauthLogin: (provider: 'github' | 'google', code: string, role?: string) => Promise<void>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => Promise<void>;
   clearError: () => void;
@@ -175,6 +176,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // OAuth登录
+  const oauthLogin = async (provider: 'github' | 'google', code: string, role: string = 'user') => {
+    dispatch({ type: 'AUTH_START' });
+    try {
+      const response: AuthResponse = await authApi.oauthLogin(provider, code, role);
+      
+      // 保存token
+      tokenManager.setToken(response.token);
+      
+      dispatch({
+        type: 'AUTH_SUCCESS',
+        payload: {
+          user: response.user,
+          token: response.token,
+        },
+      });
+    } catch (error) {
+      dispatch({
+        type: 'AUTH_FAILURE',
+        payload: error instanceof Error ? error.message : 'OAuth登录失败',
+      });
+      throw error;
+    }
+  };
+
   // 用户登出
   const logout = () => {
     tokenManager.clearToken();
@@ -205,6 +231,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     ...state,
     login,
     register,
+    oauthLogin,
     logout,
     updateUser,
     clearError,

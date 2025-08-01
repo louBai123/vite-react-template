@@ -127,6 +127,20 @@ export interface RegisterRequest {
   role?: 'user' | 'creator' | 'advertiser';
 }
 
+export interface OAuthRegisterRequest {
+  provider: 'github' | 'google';
+  code: string;
+  role?: 'user' | 'creator' | 'advertiser';
+}
+
+export interface OAuthUserInfo {
+  id: string;
+  email: string;
+  name: string;
+  avatar_url?: string;
+  provider: 'github' | 'google';
+}
+
 export interface JWTPayload {
   userId: number;
   username: string;
@@ -190,4 +204,8 @@ export interface Env {
   JWT_SECRET: string;
   UPLOAD_BUCKET: R2Bucket;
   ENVIRONMENT: 'development' | 'production';
+  GITHUB_CLIENT_ID: string;
+  GITHUB_CLIENT_SECRET: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
 }

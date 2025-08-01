@@ -8,7 +8,9 @@ CREATE TABLE users (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255), -- 允许为空，支持OAuth用户
+    oauth_provider VARCHAR(20), -- OAuth提供商：github, google
+    oauth_id VARCHAR(100), -- OAuth用户ID
     role ENUM('user', 'creator', 'admin', 'advertiser') DEFAULT 'user',
     avatar_url VARCHAR(255),
     balance DECIMAL(10,2) DEFAULT 0.00,
@@ -19,7 +21,8 @@ CREATE TABLE users (
     INDEX idx_username (username),
     INDEX idx_email (email),
     INDEX idx_role (role),
-    INDEX idx_status (status)
+    INDEX idx_status (status),
+    INDEX idx_oauth (oauth_provider, oauth_id)
 );
 
 -- 分类表

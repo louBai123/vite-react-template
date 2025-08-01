@@ -14,6 +14,7 @@ import ProfilePage from './pages/ProfilePage';
 import CreatorPage from './pages/CreatorPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import { GitHubCallbackPage, GoogleCallbackPage } from './pages/OAuthCallbackPage';
 import './index.css';
 
 // 创建 React Query 客户端
@@ -45,6 +46,8 @@ function App() {
                   <Route path="/creator" element={<CreatorPage />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/auth/github/callback" element={<GitHubCallbackPage />} />
+                  <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </main>
