@@ -19,7 +19,7 @@ const app = new Hono<AppContext>();
 
 // 中间件
 app.use('*', cors({
-  origin: ['http://localhost:5173', 'https://your-domain.com'],
+  origin: ['http://localhost:5173', 'https://www.chaofengq.com'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -167,7 +167,7 @@ app.post('/api/auth/oauth/:provider', async (c) => {
 app.get('/api/auth/oauth/:provider/url', async (c) => {
   try {
     const provider = c.req.param('provider') as 'github' | 'google';
-    const redirectUri = c.req.query('redirect_uri') || `${c.env.ENVIRONMENT === 'production' ? 'https://your-domain.com' : 'http://localhost:5173'}/auth/${provider}/callback`;
+    const redirectUri = c.req.query('redirect_uri') || `${c.env.ENVIRONMENT === 'production' ? 'https://www.chaofengq.com' : 'http://localhost:5173'}/auth/${provider}/callback`;
 
     let authUrl = '';
     

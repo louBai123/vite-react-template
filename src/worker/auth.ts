@@ -354,7 +354,7 @@ export class AuthService {
           client_secret: this.env.GOOGLE_CLIENT_SECRET,
           code: code,
           grant_type: 'authorization_code',
-          redirect_uri: `${this.env.ENVIRONMENT === 'production' ? 'https://your-domain.com' : 'http://localhost:5173'}/auth/google/callback`,
+          redirect_uri: `${this.env.ENVIRONMENT === 'production' ? 'https://www.chaofengq.com' : 'http://localhost:5173'}/auth/google/callback`,
         }),
       });
 
